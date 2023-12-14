@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindMaze Mastery - Tile Flipping</title>
+    <style>
+        body {
+            background: url("./NEW.png");
+            background-size: cover;
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+        }
+
+        #board {
+            height: 532px;
+            width: 475px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            background-color: whitesmoke;
+            border: 10px solid lightgrey;
+        }
+
+        .card {
+            height: 128px;
+            width: 90px;
+            margin: 2.5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Score: <span id="score">15</span></h2>
+    <div id="timer">Memorize the pairs within the next 15 seconds. Your task is to match the pairs once the cards are hidden.</div>
+    <div id="board"></div>
+    <script>
+        var score = 15;
+        var cardList = [
+            "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+        ];
+
+        var cardSet;
+        var board = [];
+        var rows = 4;
+        var columns = 5;
+
+        var card1Selected;
+        var card2Selected;
+
+        var timer;
+        var countdown = 15;
+
+        window.onload = function() {
+            shuffleCards();
+            startGame();
+        }
+
+        function shuffleCards() {
+            // Create a copy of the cardList array
+            cardSet = cardList.slice();
+            for (let i = 0; i < cardSet.length; i++) {
+                let j = Math.floor(Math.random() * cardSet.length);
+                let temp = cardSet[i];
+                cardSet[i] = cardSet[j];
+                cardSet[j] = temp;
+            }
+        }
+
+        function startGame() {
+            displayTimer();
+            for (let r = 0; r < rows; r++) {
+                let row = [];
+                for (let c = 0; c < columns; c++) {
+                    let cardImg = cardSet.pop();
+                    row.push(cardImg);
+                    let card = document.createElement("img");
+                    card.id = r.toString() + "-" + c.toString();
+                    card.src = cardImg + ".png";
+                    card.classList.add("card");
+                    card.addEventListener("click", selectCard);
+                    document.getElementById("board").append(card);
+                }
+                board.push(row);
+            }
+            timer = setInterval(hideCards, 1000);
+        }
+
+        function displayTimer() {
+            var timerDiv = document.getElementById("timer");
+            timerDiv.innerText = "Memorize the pairs within the next " + countdown + " seconds. Your task is to match the pairs once the cards are hidden.";
+        }
+
+        function hideCards() {
+            if (countdown === 0) {
+                clearInterval(timer);
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < columns; c++) {
+                        let card = document.getElementById(r.toString() + "-" + c.toString());
+                        card.src = "15.png";
+                    }
+                }
+                // Add any additional logic you need after cards are hidden
+            } else {
+                countdown--;
+                displayTimer();
+            }
+        }
+
+        function selectCard() {
+            if (this.src.includes("15")) {
+                if (!card1Selected) {
+                    card1Selected = this;
+                    let coords = card1Selected.id.split("-");
+                    let r = parseInt(coords[0]);
+                    let c = parseInt(coords[1]);
+                    card1Selected.src = board[r][c] + ".png";
+                } else if (!card2Selected && this != card1Selected) {
+                    card2Selected = this;
+                    let coords = card2Selected.id.split("-");
+                    let r = parseInt(coords[0]);
+                    let c = parseInt(coords[1]);
+                    card2Selected.src = board[r][c] + ".png";
+                    setTimeout(update, 1000);
+                }
+            }
+        }
+
+        function update() {
+            if (card1Selected.src !== card2Selected.src) {
+                card1Selected.src = "15.png";
+                card2Selected.src = "15.png";
+                score -= 1;
+                document.getElementById("score").innerText = score;
+                if (score === 0) {
+                    resetGame();
+                }
+            }
+            card1Selected = null;
+            card2Selected = null;
+        }
+
+        function resetGame() {
+            // Add any additional logic you need to reset the game
+            score = 15;
+            document.getElementById("score").innerText = score;
+            countdown = 15;
+            displayTimer();
+            shuffleCards();
+            startGame();
+        }
+    </script>
+</body>
+</html>

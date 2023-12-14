@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capacity Testing</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            background: linear-gradient(115deg, rgba(101,151,209,0.8),rgba(202,102,211,0.5)),url(/quizbg.jpg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+
+        img {
+            width: 5.5rem;
+            height: 5.2rem;
+            border-radius: 50%;
+        }
+
+        .img {
+            position: fixed;
+        }
+
+        #title {
+            text-align: center;
+            padding: 0.8rem 0;
+            font-size: 3rem;
+            color: rgb(49,70,7);
+            background: rgba(105,224,90,0.55);
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        .questions {
+            margin: 3rem auto;
+            width: 90vw;
+            padding: 2rem;
+            background: rgba(0,255,221,0.45);
+            cursor: default;
+            border-radius: 1rem;
+        }
+
+        #question {
+            margin-bottom: 1rem;
+        }
+
+        .option {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            border-bottom: solid 0.1rem blue;
+            width: 15rem;
+            background: lightblue;
+            border-radius: 1rem;
+        }
+
+        .option:hover {
+            color: white;
+        }
+
+        ol {
+            position: relative;
+            padding: 0 1.5rem;
+            color: rgb(1,73,73);
+        }
+
+        span {
+            display: block;
+            padding: 0.1rem 0.7rem;
+            border-radius: 1rem;
+        }
+
+        #answer {
+            margin-top: 2.5rem;
+        }
+
+        #stat {
+            margin-top: 1.5rem;
+            color: rgb(6,17,168);
+        }
+
+        .buttons {
+            text-align: center;
+        }
+
+        button {
+            padding: 0.2rem 1.5rem;
+            border: none;
+            outline: none;
+            font-size: 1.5rem;
+            border-radius: 1.5rem;
+            color: rgba(93,53,156,0.98);
+            background: rgba(161,177,19,0.82);
+        }
+
+        button:active {
+            background: lavender;
+        }
+
+        #scoreboard, #answerBank {
+            width: 20rem;
+            background: rgba(230,230,250,0.77);
+            padding: 2rem;
+            text-align: center;
+            margin: auto;
+            position: relative;
+            top: 5rem;
+            display: none;
+        }
+
+        #score-title {
+            margin: 1rem 0;
+        }
+
+        #score-btn, #check-answer {
+            margin-top: 1rem;
+        }
+
+        #score {
+            font-size: 2.5rem;
+        }
+
+        #answerBank li {
+            text-align: left;
+            margin-bottom: 0.2rem;
+            font-size: larger;
+        }
+
+        #answers {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <img src="quiz.jpg" alt="img" id="img" class="img">
+    <h1 id="title">Capacity Testing</h1>
+
+    <!-- quiz-container -->
+    <div id="quiz-container">
+        <!-- question container -->
+        <div class="questions">
+            <h2 id="question"></h2>
+            <ol type="A">
+                <li class="option"><span id="option0" onclick="calcScore(this)"></span></li>
+                <li class="option"><span id="option1" onclick="calcScore(this)"></span></li>
+                <li class="option"><span id="option2" onclick="calcScore(this)"></span></li>
+                <li class="option"><span id="option3" onclick="calcScore(this)"></span></li>
+            </ol>
+            <h4 id="stat"></h4>
+        </div>
+        <p id="displayValue"></p>
+        <div class="buttons">
+            <button type="button" class="next" onclick="nextQuestion()">skip</button>
+        </div>
+    </div>
+
+    <!-- scoreboard section -->
+    <div id="scoreboard">
+        <!-- <img src="/Logo2.jpg" alt=""> -->
+        <!-- <h2 id="score-title">Your Score</h2> -->
+        <h2 id="score"></h2>
+        <!-- <button type="button" id="score-btn" onclick="backToQuiz()">Back to Quiz</button> -->
+        <button type="button" id="check-answer" onclick="checkAnswer()">Continue</button>
+    </div>
+
+    <!-- answers section -->
+    <div id="answerBank">
+        <h2>Answers :</h2>
+        <ol type="1" id="answers"></ol>
+        <!-- <button type="button" id="score-btn" onclick="backToQuiz()">Back to Quiz</button> -->
+    </div>
+
+    <!-- javascript file source -->
+    <script>
+        var questionBank = [
+    {
+        question: "If a train travels 20 meters in 1/5 second, how many feet will it travel in thirty seconds?",
+        option: [
+            "750 metres",
+            "1200 metres",
+            "300 metres",
+            "600 metres"
+        ],
+        answer: "600 metres"
+    },
+    {
+        question: "If it takes 6 hours for 3 people to complete a task, how long will it take 2 people to complete the same task?",
+        option: [
+            "15 hours",
+            "9 hours",
+            "12 hours",
+            "8 hours"
+        ],
+        answer: "9 hours"
+    },
+    {
+        question: "The price of a book is $18, and the book is on sale for 20% off. What is the final price?",
+        option: [
+            "$10.00",
+            "$15.00",
+            "$16.50",
+            "$14.40"
+        ],
+        answer: "$14.40"
+    },
+    {
+        question: "If a shirt costs $30 after a 25% discount, what was its original price?",
+        option: [
+            "$35",
+            "$55",
+            "$45",
+            "$40"
+        ],
+        answer: "$40"
+    },
+    {
+        question: "If the first two statements are true, is the last statement true?\na. All cats can fly.\nb. Some cats are black.\nc. No black things can fly.",
+        option: [
+            "Yes, the last statement is true.",
+            "No, the last statement is false.",
+            "It cannot be determined.",
+            "Only statement b is true."
+        ],
+        answer: "No, the last statement is false."
+    },
+    {
+        question: "What comes next in the series: 2, 5, 10, 17, ___?",
+        option: [
+            "20",
+            "24",
+            "30",
+            "26"
+        ],
+        answer: "26"
+    },
+    {
+        question: "The clock shows 3:15. What is the angle between the hour and minute hands?",
+        option: [
+            "5.0 degrees",
+            "0 degrees",
+            "360 degrees",
+            "7.5 degrees"
+        ],
+        answer: "7.5 degrees"
+    },
+    {
+        question: "If all roses are flowers and some flowers fade quickly, can it be concluded that some roses fade quickly?",
+        option: [
+            "Yes",
+            "No",
+            "It cannot be determined",
+            "Maybe"
+        ],
+        answer: "Yes"
+    },
+    {
+        question: "Complete the analogy: Ocean is to Earth as bloodstream is to ___.",
+        option: [
+            "Artery",
+            "Heart",
+            "Vein",
+            "Muscle"
+        ],
+        answer: "Heart"
+    },
+    {
+        question: "Complete the analogy: Giraffe : Tallest :: Cheetah : ?",
+        option: [
+            "Fastest",
+            "Spotted",
+            "Climber",
+            "Powerful"
+        ],
+        answer: "Fastest"
+    },
+    {
+        question: "Which of the following elements is not a noble gas?",
+        option: [
+            "Helium",
+            "Neon",
+            "Krypton",
+            "Argon"
+        ],
+        answer: "Krypton"
+    },
+    {
+        question: "Feather is to bird as scale is to ________.",
+        option: [
+            "Reptile",
+            "Fish",
+            "Mammal",
+            "Amphibian"
+        ],
+        answer: "Reptile"
+    },
+    {
+        question: "If a box contains 12 red balls and 8 blue balls, what is the probability of randomly selecting a red ball?",
+        option: [
+            "60%",
+            "40%",
+            "50%",
+            "70%"
+        ],
+        answer: "60%"
+    },
+   
+    {
+        question: "If a recipe calls for a certain amount of flour represented by the variable x, and you want to make the recipe four times as large but then reduce it to one-fifth of that amount, how much flour do you need?",
+        option: [
+            "4x - 5 cups of flour",
+            "4x/5 cups of flour",
+            "4 - 1/5 cups of flour",
+            "x/4 + 5 cups of flour"
+        ],
+        answer: "4x/5 cups of flour"
+    },
+    {
+        question: "If the ratio of boys to girls in a class is 3:2 and there are 45 boys, how many girls are there?",
+        option: [
+            "25",
+            "40",
+            "20",
+            "30"
+        ],
+        answer: "30"
+    },
+    {
+        question: "If a rectangle has a diagonal of length 13 units and a width of 5 units, what is its length, and what is its area?",
+        option: [
+            "Length = 12 units, Area = 60 square units",
+            "Length = 8 units, Area = 40 square units",
+            "Length = 15 units, Area = 75 square units",
+            "Length = 10 units, Area = 50 square units"
+        ],
+        answer: "Length = 12 units, Area = 60 square units"
+    },
+    {
+        question: "Define the word \'perseverance\' in your own words.",
+        option: [
+            "Perseverance is the ability to finish tasks quickly.",
+            "Perseverance is the tendency to give up easily.",
+            "Perseverance is the quality of persistence and determination in the face of challenges.",
+            "Perseverance is synonymous with laziness."
+        ],
+        answer: "Perseverance is the quality of persistence and determination in the face of challenges."
+    },
+    {
+        question: "Solve the following mathematical equation: (2x-3)/5+7=3x-2.",
+        option: [
+            "x = 13/3",
+            "x = - 4/3",
+            "x = 2",
+            "x = - 5/2"
+        ],
+        answer: "x = 13/3"
+    },
+    {
+        question: "Explain the concept of gravity.",
+        option: [
+            "Gravity is caused by the Earth's rotation.",
+            "Gravity is a force that pushes objects away from each other.",
+            "Gravity is stronger on the Moon than on Earth.",
+            "Gravity is the result of mass warping the fabric of spacetime."
+        ],
+        answer: "Gravity is the result of mass warping the fabric of spacetime."
+    },
+    {
+        question: "What is the capital of Indonesia?",
+        option: [
+            "Jakarta",
+            "Kuala Lumpur",
+            "Manila",
+            "Bangkok"
+        ],
+        answer: "Jakarta"
+    },
+    {
+        question: "What comes next in the series 15, 3, 45, 16, 4, 64, 17, 5, 85, 20, 6, ___?",
+        option: [
+            "120",
+            "92",
+            "20",
+            "107"
+        ],
+        answer: "120"
+    },
+    {
+        question: "What comes next in the series A, D, I, P, Y,___?",
+        option: [
+            "L",
+            "M",
+            "J",
+            "K"
+        ],
+        answer: "K"
+    },
+    {
+        question: "Solve the mathematical problem: (3 x 5) + 12 ÷ 2 - 7 x 7",
+        option: [
+            "-32",
+            "-28",
+            "-20",
+            "-24"
+        ],
+        answer: "-28"
+    },
+    {
+        question: "If a triangle has sides of lengths 3, 4, and 5, what type of triangle is it?",
+        option: [
+            "Acute-angled triangle",
+            "Obtuse-angled triangle",
+            "Right-angled triangle",
+            "Equilateral triangle"
+        ],
+        answer: "Right-angled triangle"
+    },
+    {
+        question: "If a grandfather is currently 67 years old and has a grandchild who is 1/5 their age, how old is the grandchild?",
+        option: [
+            "14 years old",
+            "13.4 years old",
+            "13 years old",
+            "15 years old"
+        ],
+        answer: "13.4 years old"
+    },
+    {
+        question: "How are a bicycle and a car similar?",
+        option: [
+            "Both are powered by fuels.",
+            "Both are used for transportation.",
+            "Both have four wheels.",
+            "Both require a driver's license."
+        ],
+        answer: "Both are used for transportation."
+    },
+    {
+        question: "What is the opposite of the word 'Bravery'?",
+        option: [
+            "Timidity",
+            "Audacity",
+            "Tenacity",
+            "Prowess"
+        ],
+        answer: "Timidity"
+    },
+    {
+        question: "In what way are a dog and a lizard alike?",
+        option: [
+            "Both are mammals.",
+            "Both are cold-blooded.",
+            "Both are reptiles.",
+            "Both are domesticated."
+        ],
+        answer: "Both are cold-blooded."
+    },
+    {
+        question: "BU,GS,LQ,QO,_,AK",
+        option: [
+            "VM",
+            "UM",
+            "VN",
+            "UX"
+        ],
+        answer: "VM"
+    },
+    {
+        question: "\"KCLFTSB\" stands for 'best of luck' and \"SHSWDG\" stands for 'good wishes'. Which of the following represents \"ace the exam\"?",
+        option: [
+            "MXHTC",
+            "MXHTC",
+            "MXHCT",
+            "XMHTC"
+        ],
+        answer: "MXHTC"
+    },
+    {
+        question: "What do these symbols represent: ∞, Δ, π?",
+        option: [
+            "Alphabets in Greek",
+            "Computer programming symbols",
+            "Mathematical constants",
+            "Astrological symbols"
+        ],
+        answer: "Mathematical constants"
+    },
+    {
+        question: "If 'fork' is related to 'eat,' what is 'hammer' related to?",
+        option: [
+            "Electric Work",
+            "Construction",
+            "Tightening screws",
+            "Cutting"
+        ],
+        answer: "Construction"
+    },
+    {
+        question: "If A is twice as old as B, and the sum of their ages is 27, how old is B?",
+        option: [
+            "B is 6 years old.",
+            "B is 9 years old.",
+            "B is 12 years old.",
+            "B is 15 years old."
+        ],
+        answer: "B is 9 years old."
+    },
+    {
+        question: "If you rotate a triangle 180 degrees clockwise, what will be its new orientation?",
+        option: [
+            "Unchanged",
+            "Flipped horizontally",
+            "Flipped vertically",
+            "Diagonally flipped"
+        ],
+        answer: "Flipped horizontally"
+    },
+    {
+        question: "If all birds can fly, and a penguin is a bird, can a penguin fly?",
+        option: [
+            "Yes, because penguins are birds.",
+            "No, because penguins are not capable of flight.",
+            "Yes, because all birds can fly.",
+            "No, because penguins are a different species of bird."
+        ],
+        answer: "No, because penguins are not capable of flight."
+    }
+];
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Shuffle the question bank to get random questions
+        shuffleArray(questionBank);
+
+        var selectedQuestions = questionBank.slice(0, 20);
+
+        var question = document.getElementById('question');
+        var quizContainer = document.getElementById('quiz-container');
+        var scoreboard = document.getElementById('scoreboard');
+        var option0 = document.getElementById('option0');
+        var option1 = document.getElementById('option1');
+        var option2 = document.getElementById('option2');
+        var option3 = document.getElementById('option3');
+        var next = document.querySelector('.next');
+        var points = document.getElementById('score');
+        var span = document.querySelectorAll('span');
+        var i = 0;
+        var score = 0;
+
+        // Function to display questions
+        function displayQuestion() {
+            for (var a = 0; a < span.length; a++) {
+                span[a].style.background = 'none';
+            }
+            question.innerHTML = 'Q.' + (i + 1) + ' ' + selectedQuestions[i].question;
+            option0.innerHTML = selectedQuestions[i].option[0];
+            option1.innerHTML = selectedQuestions[i].option[1];
+            option2.innerHTML = selectedQuestions[i].option[2];
+            option3.innerHTML = selectedQuestions[i].option[3];
+            stat.innerHTML = 'Question' + ' ' + (i + 1) + ' ' + 'of' + ' ' + selectedQuestions.length;
+        }
+
+        // Function to calculate scores
+        function calcScore(e) {
+            if (e.innerHTML === selectedQuestions[i].answer && score < selectedQuestions.length) {
+                score = score + 1;
+                document.getElementById(e.id).style.background = 'limegreen';
+            } else {
+                document.getElementById(e.id).style.background = 'tomato';
+            }
+            setTimeout(nextQuestion, 300);
+        }
+
+        // Function to display next question
+        function nextQuestion() {
+            if (i < selectedQuestions.length - 1) {
+                i = i + 1;
+                displayQuestion();
+            } else {
+                points.innerHTML = score + '/' + selectedQuestions.length;
+                if (score > 16) {
+                    points.innerHTML = "Your learning capabilities are advanced, showcasing a high level of proficiency and mastery in your educational development.";
+                } else if (score >= 10) {
+                    points.innerHTML = "Your learning capabilities are evolving, reflecting progress beyond the basics and entering a stage of intermediate educational development.";
+                } else {
+                    points.innerHTML = "Your learning capabilities are basic, marking the initial phase of your educational development.";
+                }
+                quizContainer.style.display = 'none';
+                scoreboard.style.display = 'block';
+            }
+        }
+
+        // Click events for the next button
+        next.addEventListener('click', nextQuestion);
+
+        // Back to Quiz button event
+        function backToQuiz() {
+            location.reload();
+        }
+
+        // Function to check answers
+        function checkAnswer() {
+        // Pass the score as a URL parameter to capacity.html
+        window.location.href = 'IT.html';
+    }
+
+        displayQuestion();
+        function getParam(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+     
+        
+    //     // Get the score from the URL parameter
+    //     var receivedScore = getParam('score');
+
+    //     // Display the received score
+    //     document.body.innerHTML += '<p>Received Score: ' + decodeURIComponent(receivedScore) + '</p>';
+
+    //     // Display the received value
+    //     document.getElementById('displayValue').innerText = 'Received Value: ' + decodeURIComponent(receivedValue);
+    // </script>
+    </body>
+</html>

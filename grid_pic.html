@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Memory Game and Grid Word Search</title>
+    <style>
+        /* Styles from Code 1 */
+        body {
+            background: url("./NEW.png");
+            background-size: cover;
+            font-family: Arial, Helvetica, sans-serif;
+            text-align: center;
+            margin: 0; /* Add to remove default margin */
+            background-color: #f4f4f4;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        img {
+            max-width:160%;
+            height: auto;
+            margin: 10px 0;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .grid {
+            text-align: center;
+            width: 150%; /* Adjust as needed */
+            max-width: 300px; /* Set a maximum width for better responsiveness */
+            margin: 0 auto; /* Center the grid */
+        }
+
+        .word-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .word-container span {
+            margin-right: 10px;
+        }
+
+        .word-input-container {
+            display: flex;
+            /* flex-direction: column; */
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .word-input {
+            width: 200px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .entered-words {
+            text-align: center;
+        }
+
+        /* Styles from Code 2 */
+        #board {
+            height: 532px;
+            width: 475px;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            background-color: whitesmoke;
+            border: 10px solid lightgrey;
+        }
+
+        .card {
+            height: 128px;
+            width: 90px;
+            margin: 2.5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Code 1 Section -->
+    <div id="code1">
+        <h2>Score: <span id="score">0</span></h2>
+        <div id="board"></div>
+
+        <script>
+            var score = 15;
+            var cardList = [
+                "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"
+            ];
+
+            var cardSet;
+            var board = [];
+            var rows = 4;
+            var columns = 5;
+
+            var card1Selected;
+            var card2Selected;
+
+            window.onload = function() {
+                shuffleCards();
+                startGame();
+            }
+
+            function shuffleCards() {
+                cardSet = cardList.concat(cardList);
+                for (let i = 0; i < cardSet.length; i++) {
+                    let j = Math.floor(Math.random() * cardSet.length);
+                    let temp = cardSet[i];
+                    cardSet[i] = cardSet[j];
+                    cardSet[j] = temp;
+                }
+            }
+
+            function startGame() {
+                for (let r = 0; r < rows; r++) {
+                    let row = [];
+                    for (let c = 0; c < columns; c++) {
+                        let cardImg = cardSet.pop();
+                        row.push(cardImg);
+                        let card = document.createElement("img");
+                        card.id = r.toString() + "-" + c.toString();
+                        card.src = cardImg + ".png";
+                        card.classList.add("card");
+                        card.addEventListener("click", selectCard);
+                        document.getElementById("board").append(card);
+                    }
+                    board.push(row);
+                }
+                setTimeout(hideCards, 12000);
+            }
+
+            function hideCards() {
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < columns; c++) {
+                        let card = document.getElementById(r.toString() + "-" + c.toString());
+                        card.src = "15.png";
+                    }
+                }
+            }
+
+            function selectCard() {
+                if (this.src.includes("15")) {
+                    if (!card1Selected) {
+                        card1Selected = this;
+                        let coords = card1Selected.id.split("-");
+                        let r = parseInt(coords[0]);
+                        let c = parseInt(coords[1]);
+                        card1Selected.src = board[r][c] + ".png";
+                    } else if (!card2Selected && this != card1Selected) {
+                        card2Selected = this;
+                        let coords = card2Selected.id.split("-");
+                        let r = parseInt(coords[0]);
+                        let c = parseInt(coords[1]);
+                        card2Selected.src = board[r][c] + ".png";
+                        setTimeout(update, 1000);
+                    }
+                }
+            }
+
+            function update() {
+                if (card1Selected.src != card2Selected.src) {
+                    card1Selected.src = "15.png";
+                    card2Selected.src = "15.png";
+                    score -= 1;
+                    document.getElementById("score").innerText = score;
+                }
+                card1Selected = null;
+                card2Selected = null;
+            }
+        </script>
+    </div>
+
+    <!-- Code 2 Section -->
+    <div id="code2">
+        <div>
+            <h1>Grid Word Search</h1>
+
+            <div class="grid-container">
+                <div class="grid">
+                    <h2>Grid 1</h2>
+                    <img src="grid1.jpg" alt="Grid 1">
+
+                    <div class="word-input-container">
+                        <label for="wordsGrid1" class="word-input">Enter your words here:</label>
+                        <input type="text" id="wordsGrid1" class="word-input" placeholder="Enter a word" onkeydown="if (event.key === 'Enter') addWord('wordsGrid1', 'enteredWordsGrid1')">
+                        <div id="enteredWordsGrid1" class="entered-words"></div>
+                    </div>
+                </div>
+
+                <div class="grid">
+                    <h2>Grid 2</h2>
+                    <img src="grid2.jpg" alt="Grid 2">
+
+                    <div class="word-input-container">
+                        <label for="wordsGrid2" class="word-input">Enter your words here:</label>
+                        <input type="text" id="wordsGrid2" class="word-input" placeholder="Enter a word" onkeydown="if (event.key === 'Enter') addWord('wordsGrid2', 'enteredWordsGrid2')">
+                        <div id="enteredWordsGrid2" class="entered-words"></div>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="checkWords()">Submit</button>
+
+            <div id="result"></div>
+        </div>
+
+        <script>
+            function addWord(inputId, displayId) {
+                var word = document.getElementById(inputId).value;
+                if (word) {
+                    var enteredWords = document.getElementById(displayId);
+
+                    // Create a new div for the word and remove button
+                    var wordContainer = document.createElement("div");
+                    wordContainer.classList.add("word-container");
+
+                    // Create a span for the word
+                    var wordSpan = document.createElement("span");
+                    wordSpan.innerHTML = `${word}`;
+
+                    // Create a button to remove the word
+                    var removeButton = document.createElement("button");
+                    removeButton.innerHTML = "Remove";
+                    removeButton.onclick = function() {
+                        // Remove the word container when the button is clicked
+                        enteredWords.removeChild(wordContainer);
+                    };
+
+                    // Append the word and remove button to the word container
+                    wordContainer.appendChild(wordSpan);
+                    wordContainer.appendChild(removeButton);
+
+                    // Append the word container to the entered words div
+                    enteredWords.appendChild(wordContainer);
+
+                    document.getElementById(inputId).value = '';
+                }
+            }
+
+            function checkWords() {
+                var wordsGrid1 = document.getElementById("enteredWordsGrid1").innerText.toLowerCase();
+                var wordsGrid2 = document.getElementById("enteredWordsGrid2").innerText.toLowerCase();
+
+                var answerKeyGrid1 = ["Cybersecurity", "cryptography", "retrieval", "optimization", "embedded", "infographics", "Quantum", "computation", "refractor", "Virtualization5", "integration", "surveillance", "analytics", "configuration", "repository", "compliance"];
+                var answerKeyGrid2 = ["Troubleshooting", "authentication", "malware", "reliability", "infrastructure", "vector", "supervised", "auditing", "outsourcing", "gradient", "redundant", "toknization", "cascading", "threat", "kernel", "schedulers"];
+
+                var correctWordsGrid1 = answerKeyGrid1.filter(word => wordsGrid1.includes(word.toLowerCase())).length;
+                var correctWordsGrid2 = answerKeyGrid2.filter(word => wordsGrid2.includes(word.toLowerCase())).length;
+
+                var totalCorrectWords = correctWordsGrid1 + correctWordsGrid2;
+                var totalWords = answerKeyGrid1.length + answerKeyGrid2.length;
+
+                var resultMessage = `Score: ${totalCorrectWords}`;
+
+                document.getElementById("result").innerHTML = resultMessage;
+            }
+        </script>
+    </div>
+</body>
+</html>

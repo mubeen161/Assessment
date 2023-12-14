@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grid Word Search</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 10px 0;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+
+        .grid {
+            text-align: center;
+            width: 45%; /* Adjust as needed */
+        }
+
+        .word-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        .word-container span {
+            margin-right: 10px;
+        }
+
+        .word-input-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .word-input {
+            width: 200px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .entered-words {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Grid Word Search</h1>
+
+        <div class="grid-container">
+            <div class="grid">
+                <h2>Grid 1</h2>
+                <img src="grid1.jpg" alt="Grid 1">
+
+                <div class="word-input-container">
+                    <label for="wordsGrid1" class="word-input">Enter your words here:</label>
+                    <input type="text" id="wordsGrid1" class="word-input" placeholder="Enter a word" onkeydown="if (event.key === 'Enter') addWord('wordsGrid1', 'enteredWordsGrid1')">
+                    <div id="enteredWordsGrid1" class="entered-words"></div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <h2>Grid 2</h2>
+                <img src="grid2.jpg" alt="Grid 2">
+
+                <div class="word-input-container">
+                    <label for="wordsGrid2" class="word-input">Enter your words here:</label>
+                    <input type="text" id="wordsGrid2" class="word-input" placeholder="Enter a word" onkeydown="if (event.key === 'Enter') addWord('wordsGrid2', 'enteredWordsGrid2')">
+                    <div id="enteredWordsGrid2" class="entered-words"></div>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="checkWords()">Submit</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function addWord(inputId, displayId) {
+            var word = document.getElementById(inputId).value;
+            if (word) {
+                var enteredWords = document.getElementById(displayId);
+
+                // Create a new div for the word and remove button
+                var wordContainer = document.createElement("div");
+                wordContainer.classList.add("word-container");
+
+                // Create a span for the word
+                var wordSpan = document.createElement("span");
+                wordSpan.innerHTML = `${word}`;
+
+                // Create a button to remove the word
+                var removeButton = document.createElement("button");
+                removeButton.innerHTML = "Remove";
+                removeButton.onclick = function() {
+                    // Remove the word container when the button is clicked
+                    enteredWords.removeChild(wordContainer);
+                };
+
+                // Append the word and remove button to the word container
+                wordContainer.appendChild(wordSpan);
+                wordContainer.appendChild(removeButton);
+
+                // Append the word container to the entered words div
+                enteredWords.appendChild(wordContainer);
+
+                document.getElementById(inputId).value = '';
+            }
+        }
+
+        function checkWords() {
+            var wordsGrid1 = document.getElementById("enteredWordsGrid1").innerText.toLowerCase();
+            var wordsGrid2 = document.getElementById("enteredWordsGrid2").innerText.toLowerCase();
+
+            var answerKeyGrid1 = ["Cybersecurity", "cryptography", "retrieval", "optimization", "embedded", "infographics", "Quantum", "computation", "refractor", "Virtualization5", "integration", "surveillance", "analytics", "configuration", "repository", "compliance"];
+            var answerKeyGrid2 = ["Troubleshooting", "authentication", "malware", "reliability", "infrastructure", "vector", "supervised", "auditing", "outsourcing", "gradient", "redundant", "toknization", "cascading", "threat", "kernel", "schedulers"];
+
+            var correctWordsGrid1 = answerKeyGrid1.filter(word => wordsGrid1.includes(word.toLowerCase())).length;
+            var correctWordsGrid2 = answerKeyGrid2.filter(word => wordsGrid2.includes(word.toLowerCase())).length;
+
+            var totalCorrectWords = correctWordsGrid1 + correctWordsGrid2;
+            var totalWords = answerKeyGrid1.length + answerKeyGrid2.length;
+
+            // var averageScore = (totalCorrectWords / totalWords) * 100;
+            var resultMessage = `Score: ${totalCorrectWords}`;
+            // var resultMessage = `Combined Average Score: ${averageScore.toFixed(2)}%`;
+
+            document.getElementById("result").innerHTML = resultMessage;
+        }
+    </script>
+</body>
+</html>

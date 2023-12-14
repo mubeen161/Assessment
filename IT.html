@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technical Knowledge</title>
+
+    <style>
+        /* Your CSS styles here */
+
+        /* Common styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: sans-serif;
+            background: linear-gradient(115deg, rgba(101, 151, 209, 0.8), rgba(202, 102, 211, 0.5)), url(/quizbg.jpg);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+        }
+
+        img {
+            width: 5.5rem;
+            height: 5.2rem;
+            border-radius: 50%;
+        }
+
+        .img {
+            position: fixed;
+        }
+
+        #title {
+            text-align: center;
+            padding: 0.8rem 0;
+            font-size: 3rem;
+            color: rgb(49, 70, 7);
+            background: rgba(105, 224, 90, 0.55);
+            font-family: Georgia, 'Times New Roman', Times, serif;
+        }
+
+        /* Quiz-specific styles */
+        .questions {
+            margin: 3rem auto;
+            width: 90vw;
+            padding: 2rem;
+            background: rgba(0, 255, 221, 0.45);
+            cursor: default;
+            border-radius: 1rem;
+        }
+
+        #question {
+            margin-bottom: 1rem;
+        }
+
+        .option {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            border-bottom: solid 0.1rem blue;
+            width: 15rem;
+            background: lightblue;
+            border-radius: 1rem;
+        }
+
+        .option:hover {
+            color: white;
+        }
+
+        ol {
+            position: relative;
+            padding: 0 1.5rem;
+            color: rgb(1, 73, 73);
+        }
+
+        span {
+            display: block;
+            padding: 0.1rem 0.7rem;
+            border-radius: 1rem;
+        }
+
+        #stat {
+            margin-top: 1.5rem;
+            color: rgb(6, 17, 168);
+        }
+
+        .buttons {
+            text-align: center;
+        }
+
+        button {
+            padding: 0.2rem 1.5rem;
+            border: none;
+            outline: none;
+            font-size: 1.5rem;
+            border-radius: 1.5rem;
+            color: rgba(93, 53, 156, 0.98);
+            background: rgba(161, 177, 19, 0.82);
+        }
+
+        button:active {
+            background: lavender;
+        }
+
+        #scoreboard,
+        #answerBank {
+            width: 20rem;
+            background: rgba(230, 230, 250, 0.77);
+            padding: 2rem;
+            text-align: center;
+            margin: auto;
+            position: relative;
+            top: 5rem;
+            display: none;
+        }
+
+        #score {
+            font-size: 2.5rem;
+        }
+
+        #answerBank li {
+            text-align: left;
+            margin-bottom: 0.2rem;
+            font-size: larger;
+        }
+
+        #answers {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <img src="quiz.jpg" alt="img" id="img" class="img">
+    <h1 id="title">Technical Knowledge</h1>
+
+    <!-- quiz-container -->
+    <div id="quiz-container">
+        <!-- question container -->
+        <div class="questions">
+            <h2 id="question"></h2>
+            <ol type="A">
+                <li class="option"><span id="option0" onclick="calcScore(this)"></span></li>
+                <li class="option"><span id="option1" onclick="calcScore(this)"></span></li>
+                <li class="option"><span id="option2" onclick="calcScore(this)"></span></li>
+                <li class="option"><span id="option3" onclick="calcScore(this)"></span></li>
+            </ol>
+            <h4 id="stat"></h4>
+        </div>
+
+        <div class="buttons">
+            <button type="button" class="next">skip</button>
+        </div>
+
+    </div>
+
+    <!-- scoreboard section -->
+    <div id="scoreboard">
+        <h2 id="score"></h2>
+        <button type="button" id="check-answer" onclick="checkAnswer()">Continue</button>
+
+    </div>
+
+    <!-- answers section -->
+    <div id="answerBank">
+        <h2>Answers :</h2>
+        <ol type="1" id="answers"></ol>
+    </div>
+    
+    <!-- JavaScript file source -->
+    <script>
+        
+var questionBank = [
+        {
+            question: "In a relational database, what does ACID stand for?",
+            option: [
+                "Atomicity, Consistency, Isolation, Durability",
+                "Association, Concurrency, Indexing, Deletion",
+                "Aggregation, Cursor, Inheritance, Deletion",
+                "Accuracy, Constraint, Isolation, Database",
+            ],
+            answer: "Atomicity, Consistency, Isolation, Durability",
+        },
+        {
+            question: "In object-oriented programming, what is encapsulation?",
+            option: [
+                "Combining different data types",
+                "Hiding the implementation details of an object and exposing only what is necessary",
+                "Breaking down a program into functions",
+                "Storing data in a structured format",
+            ],
+            answer: "Hiding the implementation details of an object and exposing only what is necessary",
+        },
+        {
+            question: "What does the term 'space complexity' refer to?",
+            option: [
+                "The amount of memory required by an algorithm",
+                "The number of basic operations performed by an algorithm",
+                "The time taken by an algorithm to execute",
+                "The time taken by an algorithm in handling large datasets",
+            ],
+            answer: "The amount of memory required by an algorithm",
+        },
+        {
+            question: "What is the advantage of a doubly linked list over a singly linked list?",
+            option: [
+                "Lower memory usage",
+                "Simplicity in implementation",
+                "Ability to traverse the list in both directions",
+                "Faster insertion and deletion",
+            ],
+            answer: "Ability to traverse the list in both directions",
+        },
+        {
+            question: "What is a key characteristic of problems suitable for dynamic programming?",
+            option: [
+                "They have optimal substructure and overlapping subproblems",
+                "They are solved using recursive algorithms",
+                "They involve divide and conquer strategies",
+                "They have a linear time complexity",
+            ],
+            answer: "They have optimal substructure and overlapping subproblems",
+        },
+        {
+            question: "Which SQL command is used to retrieve data from a database?",
+            option: ["INSERT", "UPDATE", "SELECT", "DELETE"],
+            answer: "SELECT",
+        },
+        {
+            question: "What is pseudocode used for in programming?",
+            option: [
+                "Generating code numbers",
+                "Documenting the algorithm in a human-readable way",
+                "Running code on the server",
+                "Default code format",
+            ],
+            answer: "Documenting the algorithm in a human-readable way",
+        },
+        {
+            question: "What is the main advantage of using functions in programming?",
+            option: [
+                "Reducing code readability",
+                "Making the code longer",
+                "Enhancing modularity and reusability",
+                "Avoiding the use of variables",
+            ],
+            answer: "Enhancing modularity and reusability",
+        },
+        {
+            question: "What is the purpose of exception handling in programming?",
+            option: [
+                "To generate errors",
+                "To avoid crashing the program",
+                "To handle unexpected situations",
+                "To avoid falling in loops",
+            ],
+            answer: "To handle unexpected situations",
+        },
+        {
+            question: "Which data structure is commonly used to implement a Last-In-First-Out (LIFO) behavior?",
+            option: ["Queue", "Stack", "Linked List", "Tree"],
+            answer: "Stack",
+        },
+        {
+            question: "What is the term for combining two strings in programming?",
+            option: ["Concatenation", "Addition", "Merging", "Appending"],
+            answer: "Concatenation",
+        },
+        {
+            question: "In many programming languages, what is the purpose of the switch statement?",
+            option: [
+                "To create loops",
+                "To handle exceptions",
+                "To define classes",
+                "To simplify multiple conditional statements",
+            ],
+            answer: "To simplify multiple conditional statements",
+        },
+        {
+            question: "What is the process of converting a variable from one data type to another called?",
+            option: ["Type casting", "Type conversion", "Variable swapping", "Data transformation"],
+            answer: "Type casting",
+        },
+        {
+            question: "Convert the decimal number 25 to binary.",
+            option: ["11001", "10101", "11101", "10011"],
+            answer: "11001",
+        },
+        {
+            question: "What is the output of an AND gate if one input is 0 and the other input is 1?",
+            option: ["0", "1", "-1", "Not defined"],
+            answer: "0",
+        },
+    ];
+
+// Function to shuffle array elements (Fisher-Yates algorithm)
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Shuffle the question bank to get random questions
+shuffleArray(questionBank);
+
+var selectedQuestions = questionBank.slice(0, 8);
+
+var question = document.getElementById('question');
+var quizContainer = document.getElementById('quiz-container');
+var scoreboard = document.getElementById('scoreboard'); // Corrected variable name
+var option0 = document.getElementById('option0');
+var option1 = document.getElementById('option1');
+var option2 = document.getElementById('option2');
+var option3 = document.getElementById('option3');
+var next = document.querySelector('.next');
+var points = document.getElementById('score');
+var span = document.querySelectorAll('span');
+var i = 0;
+var score = 0;
+
+// Function to display questions
+function displayQuestion() {
+    for (var a = 0; a < span.length; a++) {
+        span[a].style.background = 'none';
+    }
+    question.innerHTML = 'Q.' + (i + 1) + ' ' + selectedQuestions[i].question;
+    option0.innerHTML = selectedQuestions[i].option[0];
+    option1.innerHTML = selectedQuestions[i].option[1];
+    option2.innerHTML = selectedQuestions[i].option[2];
+    option3.innerHTML = selectedQuestions[i].option[3];
+    stat.innerHTML = 'Question' + ' ' + (i + 1) + ' ' + 'of' + ' ' + selectedQuestions.length;
+}
+
+// Function to calculate scores
+function calcScore(e) {
+    if (e.innerHTML === selectedQuestions[i].answer && score < selectedQuestions.length) {
+        score = score + 1;
+        document.getElementById(e.id).style.background = 'limegreen';
+    } else {
+        document.getElementById(e.id).style.background = 'tomato';
+    }
+    setTimeout(nextQuestion, 300);
+}
+
+// Function to display next question
+function nextQuestion() {
+    if (i < selectedQuestions.length - 1) {
+        i = i + 1;
+        displayQuestion();
+    } else {
+        points.innerHTML = score + '/' + selectedQuestions.length;
+        if (score >= 7) {
+            points.innerHTML = "You have a  advanced technical knowledge.";
+        } else if (score >= 5) {
+            points.innerHTML = "You have a  intermediate technical knowledge.";
+        } else if (score >=4 ) {
+            points.innerHTML = "You have a foundational technical knowledge.";
+        } else {
+            points.innerHTML = "You have a basic technical knowledge.";
+        }
+        quizContainer.style.display = 'none';
+        scoreboard.style.display = 'block';
+    }
+}
+
+// Click events for the next button
+next.addEventListener('click', nextQuestion);
+
+// Back to Quiz button event
+function backToQuiz() {
+    location.reload();
+}
+
+// Function to check answers
+function checkAnswer() {
+        // Pass the score as a URL parameter to capacity.html
+        window.location.href = 'quiz.html';
+    }
+
+displayQuestion();
+
+    </script>
+</body>
+</html>
